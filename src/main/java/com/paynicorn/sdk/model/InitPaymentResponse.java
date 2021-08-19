@@ -21,4 +21,12 @@ public class InitPaymentResponse {
     private String status;//	OPTIONAL transaction status (1:for success；-1：processing；0：failure)
 
     private String webUrl;//	OPTIONAL paynicorn cashier uri
+
+    private PayInstruction payInstruction;
+
+    @Data
+    class PayInstruction {
+        private String mode;
+        private String note;
+    }
 }

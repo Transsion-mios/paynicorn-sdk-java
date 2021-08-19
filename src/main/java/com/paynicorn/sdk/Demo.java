@@ -1,7 +1,6 @@
 package com.paynicorn.sdk;
 
 
-import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.port;
 
@@ -30,6 +29,8 @@ public class Demo {
         initPaymentRequest.setCountryCode("NG");
         initPaymentRequest.setCurrency("NGN");
         initPaymentRequest.setAmount("100");
+        initPaymentRequest.setBankCode("NG001");
+        initPaymentRequest.setPayMethod("USSD");
         initPaymentRequest.setCpFrontPage("PUT_YOUR_WEB_REDIRECT_URL_HERE");
         initPaymentRequest.setOrderDescription("TEST GOODS NAME");
         InitPaymentResponse initPaymentResponse = Paynicorn.initPayment(appKey,merchantSecret, initPaymentRequest);
