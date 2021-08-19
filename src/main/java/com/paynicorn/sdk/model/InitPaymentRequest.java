@@ -52,4 +52,8 @@ public class InitPaymentRequest implements Serializable {
 
     private String orderId;
 
+    private String bankCode;
+
+    private String cnic;
+
 }
