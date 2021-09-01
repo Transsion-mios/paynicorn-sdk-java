@@ -4,8 +4,7 @@ package com.paynicorn.sdk;
 import static spark.Spark.post;
 import static spark.Spark.port;
 
-
-import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
 import com.paynicorn.sdk.model.*;
 
 import java.io.IOException;
@@ -22,6 +21,7 @@ public class Demo {
     private static final String merchantSecret = "PUT_YOUR_MERCHANT_SECRET_HERE";
     public static void main(String[] args) throws IOException {
 
+        Gson gson = new Gson();
 
         //raise a payment request to PAYNICORN
         InitPaymentRequest initPaymentRequest = new InitPaymentRequest();
@@ -34,7 +34,7 @@ public class Demo {
         initPaymentRequest.setCpFrontPage("PUT_YOUR_WEB_REDIRECT_URL_HERE");
         initPaymentRequest.setOrderDescription("TEST GOODS NAME");
         InitPaymentResponse initPaymentResponse = Paynicorn.initPayment(appKey,merchantSecret, initPaymentRequest);
-        System.out.println(JSON.toJSONString(initPaymentResponse));
+        System.out.println(gson.toJson(initPaymentResponse));
 
 
         //query a payment status from PAYNICORN
@@ -42,7 +42,7 @@ public class Demo {
         queryPaymentRequest.setOrderId("PUT_YOUR_ORDER_ID_HERE");
         queryPaymentRequest.setTxnType(Paynicorn.TxnType.PAYMENT);
         QueryPaymentResponse queryPaymentResponse = Paynicorn.queryPayment(appKey,merchantSecret,queryPaymentRequest);
-        System.out.println(JSON.toJSONString(queryPaymentResponse));
+        System.out.println(gson.toJson(queryPaymentResponse));
 
 
         //receive a payment status postback from PAYNICORN
@@ -52,7 +52,7 @@ public class Demo {
             PostbackInfo info = Paynicorn.receivePostback(merchantSecret,body);
 
             if (info.isVerified()){
-                System.out.println(JSON.toJSONString(info));
+                System.out.println(gson.toJson(info));
 
                 //you need to response "success_"+TxnId in PostbackInfo to PAYNICORN if you receive the postback successfully
                 //otherwise, PAYNICORN will continue to send the postback to your server unless you give that response

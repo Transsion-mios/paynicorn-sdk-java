@@ -18,7 +18,6 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

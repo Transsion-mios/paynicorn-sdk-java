@@ -1,7 +1,6 @@
 package com.paynicorn.sdk;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import com.paynicorn.sdk.model.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -40,8 +39,9 @@ public class Paynicorn {
 
 
     public static InitPaymentResponse initPayment(String appKey, String merchantSecret, InitPaymentRequest initPaymentRequest) throws IOException {
+        Gson gson = new Gson();
 
-        String jsonStr = JSON.toJSONString(initPaymentRequest);
+        String jsonStr = gson.toJson(initPaymentRequest);
         byte[] datautf8 = jsonStr.getBytes("utf-8");
         String base64str = Base64.encodeBase64String(datautf8);
         //md5 sign
@@ -50,22 +50,22 @@ public class Paynicorn {
 
         String md5sign = DigestUtils.md5Hex(signStr);
         HttpPost http = new HttpPost(paymentUrl);
-        JSONObject request = new JSONObject();
-        request.put("content",base64str);
-        request.put("sign",md5sign);
-        request.put("appKey",appKey);
+        Request request = new Request();
+        request.setContent(base64str);
+        request.setAppKey(appKey);
+        request.setSign(md5sign);
         http.setHeader("Content-Type","application/json");
-        StringEntity entity = new StringEntity(request.toJSONString(),"UTF-8");
+        StringEntity entity = new StringEntity(gson.toJson(request),"UTF-8");
         http.setEntity(entity);
         HttpClient httpClient = HttpClients.createDefault();
-        HttpResponse response = httpClient.execute(http);
-        String res = EntityUtils.toString(response.getEntity());
-        JSONObject resjson = JSON.parseObject(res);
+        HttpResponse httpResponse = httpClient.execute(http);
+        String res = EntityUtils.toString(httpResponse.getEntity());
 
-        if("000000".equalsIgnoreCase(resjson.getString("responseCode"))){
-            String content = resjson.getString("content");
+        Response response = gson.fromJson(res,Response.class);
+        if(response != null && "000000".equalsIgnoreCase(response.getResponseCode())){
+            String content = response.getContent();
             String decodeContent = new String(Base64.decodeBase64(content.getBytes()));
-            InitPaymentResponse initPaymentResponse = JSON.parseObject(decodeContent, InitPaymentResponse.class);
+            InitPaymentResponse initPaymentResponse = gson.fromJson(decodeContent, InitPaymentResponse.class);
             return initPaymentResponse;
         }else {
             return null;
@@ -73,7 +73,9 @@ public class Paynicorn {
     }
 
     public static QueryPaymentResponse queryPayment(String appKey, String merchantSecret, QueryPaymentRequest queryPaymentRequest) throws IOException {
-        String jsonstr = JSON.toJSONString(queryPaymentRequest);
+        Gson gson = new Gson();
+
+        String jsonstr = gson.toJson(queryPaymentRequest);
 
         //base64 encode
         byte[] datautf8 = jsonstr.getBytes("utf-8");
@@ -84,21 +86,22 @@ public class Paynicorn {
 
         String md5sign = DigestUtils.md5Hex(signStr);
         HttpPost http = new HttpPost(queryPaymentUrl);
-        JSONObject request = new JSONObject();
-        request.put("content",base64str);
-        request.put("sign",md5sign);
-        request.put("appKey",appKey);
+        Request request = new Request();
+        request.setContent(base64str);
+        request.setAppKey(appKey);
+        request.setSign(md5sign);
         http.setHeader("Content-Type","application/json");
-        StringEntity entity = new StringEntity(request.toJSONString(),"UTF-8");
+        StringEntity entity = new StringEntity(gson.toJson(request),"UTF-8");
         http.setEntity(entity);
         HttpClient httpClient = HttpClients.createDefault();
-        HttpResponse response = httpClient.execute(http);
-        String res = EntityUtils.toString(response.getEntity());
-        JSONObject resjson = JSON.parseObject(res);
-        if("000000".equalsIgnoreCase(resjson.getString("responseCode"))){
-            String content = resjson.getString("content");
+        HttpResponse httpResponse = httpClient.execute(http);
+        String res = EntityUtils.toString(httpResponse.getEntity());
+
+        Response response = gson.fromJson(res,Response.class);
+        if(response != null && "000000".equalsIgnoreCase(response.getResponseCode())){
+            String content = response.getContent();
             String decodeContent = new String(Base64.decodeBase64(content.getBytes()));
-            return JSON.parseObject(decodeContent,QueryPaymentResponse.class);
+            return gson.fromJson(decodeContent,QueryPaymentResponse.class);
         }else {
             return null;
         }
@@ -107,7 +110,9 @@ public class Paynicorn {
 
     public static PostbackInfo receivePostback(String merchantSecret, String body){
 
-        PostbackRequest request = JSON.parseObject(body,PostbackRequest.class);
+        Gson gson = new Gson();
+
+        PostbackRequest request = gson.fromJson(body,PostbackRequest.class);
 
         String base64Content = request.getContent();
         String sign = request.getSign();
@@ -117,7 +122,7 @@ public class Paynicorn {
         if (md5sign.equals(sign)){
             byte[] contentBytes = Base64.decodeBase64(base64Content);
             String content = new String(contentBytes);
-            PostbackInfo info = JSON.parseObject(content, PostbackInfo.class);
+            PostbackInfo info = gson.fromJson(content, PostbackInfo.class);
             info.setVerified(true);
             return info;
         }else{
@@ -128,7 +133,9 @@ public class Paynicorn {
     }
 
     public static QueryMethodResponse queryMethod(String appKey, String merchantSecret, QueryMethodRequest queryMethodRequest) throws IOException{
-        String jsonstr = JSON.toJSONString(queryMethodRequest);
+        Gson gson = new Gson();
+
+        String jsonstr = gson.toJson(queryMethodRequest);
 
         //base64 encode
         byte[] datautf8 = jsonstr.getBytes("utf-8");
@@ -139,22 +146,22 @@ public class Paynicorn {
 
         String md5sign = DigestUtils.md5Hex(signStr);
         HttpPost http = new HttpPost(queryMethodUrl);
-        JSONObject request = new JSONObject();
-        request.put("content",base64str);
-        request.put("sign",md5sign);
-        request.put("appKey",appKey);
+        Request request = new Request();
+        request.setContent(base64str);
+        request.setAppKey(appKey);
+        request.setSign(md5sign);
         http.setHeader("Content-Type","application/json");
-        StringEntity entity = new StringEntity(request.toJSONString(),"UTF-8");
+        StringEntity entity = new StringEntity(gson.toJson(request),"UTF-8");
         http.setEntity(entity);
         HttpClient httpClient = HttpClients.createDefault();
-        HttpResponse response = httpClient.execute(http);
-        String res = EntityUtils.toString(response.getEntity());
-        JSONObject resjson = JSON.parseObject(res);
+        HttpResponse httpResponse = httpClient.execute(http);
+        String res = EntityUtils.toString(httpResponse.getEntity());
 
-        if("000000".equalsIgnoreCase(resjson.getString("responseCode"))){
-            String content = resjson.getString("content");
+        Response response = gson.fromJson(res,Response.class);
+        if(response != null && "000000".equalsIgnoreCase(response.getResponseCode())){
+            String content = response.getContent();
             String decodeContent = new String(Base64.decodeBase64(content.getBytes()));
-            QueryMethodResponse queryMethodResponse = JSON.parseObject(decodeContent, QueryMethodResponse.class);
+            QueryMethodResponse queryMethodResponse = gson.fromJson(decodeContent,QueryMethodResponse.class);
             return queryMethodResponse;
         }else {
             return null;
