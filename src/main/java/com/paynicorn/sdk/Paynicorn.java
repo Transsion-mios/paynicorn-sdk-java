@@ -36,6 +36,8 @@ public class Paynicorn {
 
     private static String queryPaymentUrl = "https://api.paynicorn.com/trade/v3/transaction/query";
 
+    private static String queryMethodUrl = "https://api.paynicorn.com/trade/v3/transaction/method";
+
 
     public static InitPaymentResponse initPayment(String appKey, String merchantSecret, InitPaymentRequest initPaymentRequest) throws IOException {
 
@@ -122,6 +124,40 @@ public class Paynicorn {
             PostbackInfo info = new PostbackInfo();
             info.setVerified(false);
             return info;
+        }
+    }
+
+    public static QueryMethodResponse queryMethod(String appKey, String merchantSecret, QueryMethodRequest queryMethodRequest) throws IOException{
+        String jsonstr = JSON.toJSONString(queryMethodRequest);
+
+        //base64 encode
+        byte[] datautf8 = jsonstr.getBytes("utf-8");
+        String base64str = Base64.encodeBase64String(datautf8);
+        //md5 sign
+
+        String signStr = base64str+merchantSecret;
+
+        String md5sign = DigestUtils.md5Hex(signStr);
+        HttpPost http = new HttpPost(queryMethodUrl);
+        JSONObject request = new JSONObject();
+        request.put("content",base64str);
+        request.put("sign",md5sign);
+        request.put("appKey",appKey);
+        http.setHeader("Content-Type","application/json");
+        StringEntity entity = new StringEntity(request.toJSONString(),"UTF-8");
+        http.setEntity(entity);
+        HttpClient httpClient = HttpClients.createDefault();
+        HttpResponse response = httpClient.execute(http);
+        String res = EntityUtils.toString(response.getEntity());
+        JSONObject resjson = JSON.parseObject(res);
+
+        if("000000".equalsIgnoreCase(resjson.getString("responseCode"))){
+            String content = resjson.getString("content");
+            String decodeContent = new String(Base64.decodeBase64(content.getBytes()));
+            QueryMethodResponse queryMethodResponse = JSON.parseObject(decodeContent, QueryMethodResponse.class);
+            return queryMethodResponse;
+        }else {
+            return null;
         }
     }
 }
