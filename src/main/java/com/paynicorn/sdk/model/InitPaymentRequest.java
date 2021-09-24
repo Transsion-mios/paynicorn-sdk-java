@@ -30,7 +30,7 @@ public class InitPaymentRequest implements Serializable {
 
     private static final long serialVersionUID = 1;
 
-    private String amount;
+    private String orderId;
 
     private String countryCode;
 
@@ -38,7 +38,7 @@ public class InitPaymentRequest implements Serializable {
 
     private String currency;
 
-    private String email;
+    private String amount;
 
     private String memo;
 
@@ -48,9 +48,9 @@ public class InitPaymentRequest implements Serializable {
 
     private String phone;
 
-    private String userId;
+    private String email;
 
-    private String orderId;
+    private String palmToken;
 
     private String bankCode;
 

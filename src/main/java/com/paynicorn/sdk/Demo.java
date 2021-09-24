@@ -45,6 +45,15 @@ public class Demo {
         System.out.println(gson.toJson(queryPaymentResponse));
 
 
+        //query support payment method from PAYNICORN
+        QueryMethodRequest queryMethodRequest = new QueryMethodRequest();
+        queryMethodRequest.setTxnType(Paynicorn.TxnType.PAYMENT);
+        queryMethodRequest.setCountryCode("NG");
+        queryMethodRequest.setCurrency("NGN");
+        QueryMethodResponse queryMethodResponse = Paynicorn.queryMethod(appKey,merchantSecret,queryMethodRequest);
+        System.out.println(gson.toJson(queryMethodResponse));
+
+
         //receive a payment status postback from PAYNICORN
         port(8080);
         post("/postback", (request, response) -> {

@@ -2,6 +2,8 @@ package com.paynicorn.sdk.model;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class QueryMethodResponse {
 
@@ -17,9 +19,9 @@ public class QueryMethodResponse {
         private String name;
         private String icon;
         private String methodType;
-        private float supportAmount[];
-        private float minAmount;
-        private float maxAmount;
-        private float discount;
+        private BigDecimal supportAmount[];
+        private BigDecimal minAmount;
+        private BigDecimal maxAmount;
+        private BigDecimal discount;
     }
 }
