@@ -20,4 +20,5 @@ public class PostbackInfo {
     private String status;
     private String code;
     private String message;
+    private String memo;
 }
