@@ -11,7 +11,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-
 import java.io.IOException;
 
 /**
@@ -125,14 +124,35 @@ public class Paynicorn {
             PostbackInfo info = gson.fromJson(content, PostbackInfo.class);
             info.setVerified(true);
             return info;
-        }else{
+        } else {
             PostbackInfo info = new PostbackInfo();
             info.setVerified(false);
             return info;
         }
     }
 
-    public static QueryMethodResponse queryMethod(String appKey, String merchantSecret, QueryMethodRequest queryMethodRequest) throws IOException{
+
+    public static RechargeCallbackInfo rechargeCallbackInfo(String merchantSecret, String body) {
+        Gson gson = new Gson();
+        PostbackRequest request = gson.fromJson(body, PostbackRequest.class);
+        String base64Content = request.getContent();
+        String sign = request.getSign();
+        String signStr = base64Content + merchantSecret;
+        String md5sign = DigestUtils.md5Hex(signStr);
+        if (md5sign.equals(sign)) {
+            byte[] contentBytes = Base64.decodeBase64(base64Content);
+            String content = new String(contentBytes);
+            RechargeCallbackInfo info = gson.fromJson(content, RechargeCallbackInfo.class);
+            info.setVerified(true);
+            return info;
+        } else {
+            RechargeCallbackInfo info = new RechargeCallbackInfo();
+            info.setVerified(false);
+            return info;
+        }
+    }
+
+    public static QueryMethodResponse queryMethod(String appKey, String merchantSecret, QueryMethodRequest queryMethodRequest) throws IOException {
         Gson gson = new Gson();
 
         String jsonstr = gson.toJson(queryMethodRequest);
